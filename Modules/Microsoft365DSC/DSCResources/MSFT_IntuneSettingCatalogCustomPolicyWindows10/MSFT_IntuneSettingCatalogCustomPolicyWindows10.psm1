@@ -14,6 +14,10 @@ function Get-TargetResource
         $Name,
 
         [Parameter()]
+        [System.String[]]
+        $RoleScopeTagIds,
+
+        [Parameter()]
         [ValidateSet('none', 'android', 'iOS', 'macOS', 'windows10X', 'windows10', 'linux', 'unknownFutureValue')]
         [System.String]
         $Platforms,
@@ -169,6 +173,7 @@ function Get-TargetResource
             #region resource generator code
             Description           = $getValue.Description
             Name                  = $getValue.Name
+            RoleScopeTagIds       = $getValue.RoleScopeTagIds
             Platforms             = $enumPlatforms
             Technologies          = $enumTechnologies
             Settings              = $complexSettings
@@ -225,6 +230,10 @@ function Set-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $Name,
+
+        [Parameter()]
+        [System.String[]]
+        $RoleScopeTagIds,
 
         [Parameter()]
         [ValidateSet('none', 'android', 'iOS', 'macOS', 'windows10X', 'windows10', 'linux', 'unknownFutureValue')]
@@ -391,6 +400,10 @@ function Test-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $Name,
+
+        [Parameter()]
+        [System.String[]]
+        $RoleScopeTagIds,
 
         [Parameter()]
         [ValidateSet('none', 'android', 'iOS', 'macOS', 'windows10X', 'windows10', 'linux', 'unknownFutureValue')]

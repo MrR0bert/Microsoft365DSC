@@ -79,6 +79,7 @@ class MSFT_IntuneSettingCatalogCustomPolicyWindows10 : OMI_BaseResource
 {
     [Write, Description("Policy description")] String Description;
     [Key, Description("Policy name")] String Name;
+    [Write, Description("List of Scope Tags for this Entity instance.")] String RoleScopeTagIds[];
     [Write, Description("Platforms for this policy. Possible values are: none, android, iOS, macOS, windows10X, windows10, linux, unknownFutureValue."), ValueMap{"none","android","iOS","macOS","windows10X","windows10","linux","unknownFutureValue"}, Values{"none","android","iOS","macOS","windows10X","windows10","linux","unknownFutureValue"}] String Platforms;
     [Write, Description("Technologies for this policy. Possible values are: none, mdm, windows10XManagement, configManager, appleRemoteManagement, microsoftSense, exchangeOnline, edgeMAM, linuxMdm, enrollment, endpointPrivilegeManagement, unknownFutureValue."), ValueMap{"none","mdm","windows10XManagement","configManager","appleRemoteManagement","microsoftSense","exchangeOnline","linuxMdm","enrollment","endpointPrivilegeManagement","unknownFutureValue"}, Values{"none","mdm","windows10XManagement","configManager","appleRemoteManagement","microsoftSense","exchangeOnline","linuxMdm","enrollment","endpointPrivilegeManagement","unknownFutureValue"}] String Technologies;
     [Write, Description("Template reference information"), EmbeddedInstance("MSFT_MicrosoftGraphdeviceManagementConfigurationPolicyTemplateReference")] String TemplateReference;
