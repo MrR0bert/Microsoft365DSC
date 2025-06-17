@@ -191,8 +191,22 @@ function Get-TargetResource
         $SelectedMobileAppNamesValue = @()
         foreach ($mobileApp in $getValue.AdditionalProperties.selectedMobileAppIds)
         {
-            $mobileEntry = Get-MgBetaDeviceAppManagementMobileApp -MobileAppId $mobileApp
-            $SelectedMobileAppNamesValue += $mobileEntry.DisplayName
+            try {
+                $mobileEntry = Get-MgBetaDeviceAppManagementMobileApp -MobileAppId $mobileApp -ErrorAction Stop
+                $SelectedMobileAppNamesValue += $mobileEntry.DisplayName
+            }
+            catch {
+		        # Log exception
+                New-M365DSCLogEntry -Message 'Error retrieving data:' `
+	            -Exception $_ `
+        	    -Source $($MyInvocation.MyCommand.Source) `
+	            -TenantId $TenantId `
+	            -Credential $Credential
+
+		        # Remove app from selectedMobileappIds
+		        $getValue.AdditionalProperties.selectedMobileAppIds = ($getValue.AdditionalProperties.selectedMobileAppIds | Where-Object -FilterScript { $_ -ne $mobileApp })
+                Continue
+            }
         }
 
         $results = @{
