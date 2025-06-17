@@ -25,9 +25,19 @@ class MSFT_MicrosoftGraphDeviceCompliancePolicyScript
     [Write, Description("Rules content of the custom settings.")] String RulesContent;
 };
 
+[ClassVersion("1.0.0.0")]
+class MSFT_MicrosoftGraphDeviceComplianceScheduledActionsForRuleConfiguration
+{
+    [Write, Description("The action type of the compliance policy action."), ValueMap{"block", "notification", "retire"}, Values{"block", "notification", "retire"}] String ActionType;
+    [Write, Description("Number of hours the device can be in grace period.")] Uint32 GracePeriodHours;
+    [Write, Description("Display names of the groups that should be notified if the compliance fails.")] String NotificationMessageCCList[];
+    [Write, Description("Display name of the Notification Template used in the compliance policy. Can only be used with ActionType 'notification'.")] String NotificationTemplate;
+};
+
 [ClassVersion("1.0.0.0"), FriendlyName("IntuneDeviceCompliancePolicyWindows10")]
 class MSFT_IntuneDeviceCompliancePolicyWindows10 : OMI_BaseResource
 {
+    [Write, Description("The id of the Windows 10 device compliance policy.")] String Id;
     [Key, Description("Display name of the Windows 10 device compliance policy.")] String DisplayName;
     [Write, Description("Description of the Windows 10 device compliance policy.")] String Description;
     [Write, Description("List of Scope Tags for this Entity instance.")] String RoleScopeTagIds[];
@@ -64,6 +74,7 @@ class MSFT_IntuneDeviceCompliancePolicyWindows10 : OMI_BaseResource
     [Write, Description("TpmRequired of the Windows 10 device compliance policy.")] Boolean TpmRequired;
     [Write, Description("DeviceCompliancePolicyScript of the Windows 10 device compliance policy."), EmbeddedInstance("MSFT_MicrosoftGraphDeviceCompliancePolicyScript")] String DeviceCompliancePolicyScript;
     [Write, Description("ValidOperatingSystemBuildRanges of the Windows 10 device compliance policy."), EmbeddedInstance("MSFT_MicrosoftGraphOperatingSystemVersionRange")] String ValidOperatingSystemBuildRanges[];
+    [Write, Description("Actions to take for noncompliant devices."), EmbeddedInstance("MSFT_MicrosoftGraphDeviceComplianceScheduledActionsForRuleConfiguration")] String ScheduledActionsForRule[];
     [Write, Description("Present ensures the policy exists, absent ensures it is removed."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] string Ensure;
     [Write, Description("Credentials of the Intune Admin"), EmbeddedInstance("MSFT_Credential")] string Credential;
     [Write, Description("Id of the Azure Active Directory application to authenticate with.")] String ApplicationId;

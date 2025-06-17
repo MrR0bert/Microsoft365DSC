@@ -145,12 +145,7 @@ function Get-TargetResource
                 catch
                 {
                     Write-Verbose -Message "Couldn't get group by ID, trying by name"
-                    if ($DisplayName.Contains("'"))
-                    {
-                        $DisplayName = $DisplayName -replace "'", "''"
-                    }
-                    $filter = "DisplayName eq '$DisplayName'"
-                    $Group = Get-MgGroup -Filter $filter -ErrorAction Stop
+                    $Group = Get-MgGroup -Filter "DisplayName eq '$($DisplayName -replace "'", "''")'" -ErrorAction Stop
                     if ($Group.Length -gt 1)
                     {
                         throw "Duplicate AzureAD Groups named $DisplayName exist in tenant"
@@ -161,12 +156,7 @@ function Get-TargetResource
             {
                 Write-Verbose -Message 'Id was NOT specified'
                 ## Can retreive multiple AAD Groups since displayname is not unique
-                if ($DisplayName.Contains("'"))
-                {
-                    $DisplayName = $DisplayName -replace "'", "''"
-                }
-                $filter = "DisplayName eq '$DisplayName'"
-                $Group = Get-MgGroup -Filter $filter -ErrorAction Stop
+                $Group = Get-MgGroup -Filter "DisplayName eq '$($DisplayName -replace "'", "''")'" -ErrorAction Stop
                 if ($Group.Length -gt 1)
                 {
                     throw "Duplicate AzureAD Groups named $DisplayName exist in tenant"
@@ -551,7 +541,7 @@ function Set-TargetResource
     {
         Write-Verbose -Message "Checking to see if an existing deleted group exists with DisplayName {$DisplayName}"
         $restoringExisting = $false
-        [Array]$groups = Get-MgBetaDirectoryDeletedItemAsGroup -Filter "DisplayName eq '$DisplayName'"
+        [Array]$groups = Get-MgBetaDirectoryDeletedItemAsGroup -Filter "DisplayName eq '$($DisplayName -replace "'", "''")'"
         if ($groups.Length -gt 1)
         {
             throw "Multiple deleted groups with the name {$DisplayName} were found. Cannot restore the existig group. Please ensure that you either have no instance of the group in the deleted list or that you have a single one."
@@ -562,7 +552,7 @@ function Set-TargetResource
             Write-Verbose -Message "Found an instance of a deleted group {$DisplayName}. Restoring it."
             Restore-MgBetaDirectoryDeletedItem -DirectoryObjectId $groups[0].Id
             $restoringExisting = $true
-            $currentGroup = Get-MgGroup -Filter "DisplayName eq '$DisplayName'" -ErrorAction Stop
+            $currentGroup = Get-MgGroup -Filter "DisplayName eq '$($DisplayName -replace "'", "''")'" -ErrorAction Stop
         }
 
         if (-not $restoringExisting)
@@ -673,7 +663,7 @@ function Set-TargetResource
                 if ($null -eq $directoryObject)
                 {
                     Write-Verbose -Message "Trying to retrieve Service Principal {$($diff.InputObject)}"
-                    $app = Get-MgApplication -Filter "DisplayName eq '$($diff.InputObject)'"
+                    $app = Get-MgApplication -Filter "DisplayName eq '$($diff.InputObject -replace "'", "''")'"
                     if ($null -ne $app)
                     {
                         $directoryObject = Get-MgServicePrincipal -Filter "AppId eq '$($app.AppId)'"
@@ -734,7 +724,7 @@ function Set-TargetResource
                 if ($null -eq $directoryObject)
                 {
                     Write-Verbose -Message "Trying to retrieve Service Principal {$($diff.InputObject)}"
-                    $app = Get-MgApplication -Filter "DisplayName eq '$($diff.InputObject)'"
+                    $app = Get-MgApplication -Filter "DisplayName eq '$($diff.InputObject -replace "'", "''")'"
                     if ($null -ne $app)
                     {
                         $directoryObject = Get-MgServicePrincipal -Filter "AppId eq '$($app.AppId)'"
@@ -744,7 +734,7 @@ function Set-TargetResource
                 if ($null -eq $directoryObject)
                 {
                     Write-Verbose -Message "Trying to retrieve Device {$($diff.InputObject)}"
-                    $directoryObject = Get-MgBetaDevice -Filter "DisplayName eq '$($diff.InputObject)'"
+                    $directoryObject = Get-MgDevice -Filter "DisplayName eq '$($diff.InputObject -replace "'", "''")'"
                 }
 
                 if ($diff.SideIndicator -eq '=>')
@@ -793,7 +783,7 @@ function Set-TargetResource
             {
                 try
                 {
-                    $groupAsMember = Get-MgGroup -Filter "DisplayName eq '$($diff.InputObject)'" -ErrorAction SilentlyContinue
+                    $groupAsMember = Get-MgGroup -Filter "DisplayName eq '$($diff.InputObject -replace "'", "''")'" -ErrorAction SilentlyContinue
                 }
                 catch
                 {
@@ -845,7 +835,7 @@ function Set-TargetResource
             {
                 try
                 {
-                    $memberOfGroup = Get-MgGroup -Filter "DisplayName eq '$($diff.InputObject)'" -ErrorAction Stop
+                    $memberOfGroup = Get-MgGroup -Filter "DisplayName eq '$($diff.InputObject -replace "'", "''")'" -ErrorAction Stop
                 }
                 catch
                 {
@@ -908,7 +898,7 @@ function Set-TargetResource
             {
                 try
                 {
-                    $role = Get-MgBetaRoleManagementDirectoryRoleDefinition -Filter "DisplayName eq '$($diff.InputObject)'"
+                    $role = Get-MgBetaRoleManagementDirectoryRoleDefinition -Filter "DisplayName eq '$($diff.InputObject -replace "'", "''")'"
                 }
                 catch
                 {

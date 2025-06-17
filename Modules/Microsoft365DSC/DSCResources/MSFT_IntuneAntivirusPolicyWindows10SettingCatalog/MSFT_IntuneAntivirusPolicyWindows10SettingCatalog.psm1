@@ -465,7 +465,7 @@ function Get-TargetResource
                 {
                     $policy = Get-MgBetaDeviceManagementConfigurationPolicy `
                         -All `
-                        -Filter "Name eq '$DisplayName'" `
+                        -Filter "Name eq '$($DisplayName -replace "'", "''")'" `
                         -ErrorAction SilentlyContinue | Where-Object `
                         -FilterScript {
                         $_.TemplateReference.TemplateId -in $templateReferences

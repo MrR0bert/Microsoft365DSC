@@ -164,7 +164,7 @@ function Get-TargetResource
                 Write-Verbose -Message "No Account Protection Policy with identity {$Identity} was found"
                 if (-not [String]::IsNullOrEmpty($DisplayName))
                 {
-                    $policy = Get-MgBetaDeviceManagementIntent -Filter "DisplayName eq '$DisplayName'" -ErrorAction SilentlyContinue
+                    $policy = Get-MgBetaDeviceManagementIntent -Filter "DisplayName eq '$($DisplayName -replace "'", "''")'" -ErrorAction SilentlyContinue
                 }
 
                 if ($null -eq $policy)

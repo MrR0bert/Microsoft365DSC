@@ -102,7 +102,7 @@ function Get-TargetResource
             {
                 if (-not [System.String]::IsNullOrEmpty($DisplayName))
                 {
-                    $policy = Get-MgBetaDeviceManagementIntent -All -Filter "displayName eq '$DisplayName'" -ErrorAction Stop | Where-Object -FilterScript { $_.TemplateId -eq '63be6324-e3c9-4c97-948a-e7f4b96f0f20' }
+                    $policy = Get-MgBetaDeviceManagementIntent -All -Filter "DisplayName eq '$($DisplayName -replace "'", "''")'" -ErrorAction Stop | Where-Object -FilterScript { $_.TemplateId -eq '63be6324-e3c9-4c97-948a-e7f4b96f0f20' }
                 }
             }
 

@@ -565,7 +565,7 @@ function Set-TargetResource
             {
                 # Retrieve by name
                 Write-Verbose -Message "Retrieving Entitlement Management Access Package by Name {$AccessPackageId}"
-                $package = Get-MgBetaEntitlementManagementAccessPackage -Filter "displayName eq '$AccessPackageId'"
+                $package = Get-MgBetaEntitlementManagementAccessPackage -Filter "DisplayName eq '$($AccessPackageId -replace "'", "''")'"
                 if ($null -ne $package)
                 {
                     $AccessPackageId = $package.Id
@@ -685,7 +685,7 @@ function Set-TargetResource
             {
                 # Retrieve by name
                 Write-Verbose -Message "Retrieving Entitlement Management Access Package by Name {$AccessPackageId}"
-                $package = Get-MgBetaEntitlementManagementAccessPackage -Filter "displayName eq '$AccessPackageId'"
+                $package = Get-MgBetaEntitlementManagementAccessPackage -Filter "DisplayName eq '$($AccessPackageId -replace "'", "''")'"
                 if ($null -ne $package)
                 {
                     $AccessPackageId = $package.Id

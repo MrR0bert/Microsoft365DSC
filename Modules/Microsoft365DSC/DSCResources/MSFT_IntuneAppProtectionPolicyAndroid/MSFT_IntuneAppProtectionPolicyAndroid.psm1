@@ -1034,7 +1034,7 @@ function Set-TargetResource
         $PSBoundParameters.Assignments | ForEach-Object {
             if ($_ -ne $null)
             {
-                $groupInfo = Get-MgGroup -Filter "DisplayName eq '$_'"
+                $groupInfo = Get-MgGroup -Filter "DisplayName eq '$($_ -replace "'", "''")'"
                 $idValue = $_
                 if (-not [System.String]::IsNullOrEmpty($groupInfo))
                 {

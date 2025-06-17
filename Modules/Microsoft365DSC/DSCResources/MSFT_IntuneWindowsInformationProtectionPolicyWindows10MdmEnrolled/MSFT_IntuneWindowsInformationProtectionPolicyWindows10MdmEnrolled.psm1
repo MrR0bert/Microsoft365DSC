@@ -181,7 +181,7 @@ function Get-TargetResource
             {
                 $getValue = Get-MgBetaDeviceAppManagementMdmWindowsInformationProtectionPolicy `
                     -All `
-                    -Filter "DisplayName eq '$DisplayName'" `
+                    -Filter "DisplayName eq '$($DisplayName -replace "'", "''")'" `
                     -ErrorAction SilentlyContinue
                 if ($getValue.Count -gt 1)
                 {

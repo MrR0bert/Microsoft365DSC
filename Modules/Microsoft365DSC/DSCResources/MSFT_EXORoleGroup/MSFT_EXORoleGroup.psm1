@@ -425,6 +425,10 @@ function Export-TargetResource
     param
     (
         [Parameter()]
+        [System.String]
+        $Filter,
+
+        [Parameter()]
         [System.Management.Automation.PSCredential]
         $Credential,
 
@@ -474,7 +478,14 @@ function Export-TargetResource
     try
     {
         $Script:ExportMode = $true
-        [array] $Script:exportedInstances = Get-RoleGroup
+        $roleGroups = Get-RoleGroup
+
+        if (-not [System.String]::IsNullOrEmpty($Filter))
+        {
+            $filterScriptBlock = [ScriptBlock]::Create($Filter)
+            $roleGroups = $roleGroups | Where-Object -FilterScript $filterScriptBlock
+        }
+        [array] $Script:exportedInstances = $roleGroups
 
         $dscContent = [System.Text.StringBuilder]::New()
 

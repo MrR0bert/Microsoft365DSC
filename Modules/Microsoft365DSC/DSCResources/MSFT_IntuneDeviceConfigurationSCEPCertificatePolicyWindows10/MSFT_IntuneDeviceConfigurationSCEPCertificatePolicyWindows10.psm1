@@ -175,7 +175,7 @@ function Get-TargetResource
                 {
                     $getValue = Get-MgBetaDeviceManagementDeviceConfiguration `
                         -All `
-                        -Filter "DisplayName eq '$DisplayName'" `
+                        -Filter "DisplayName eq '$($DisplayName -replace "'", "''")'" `
                         -ErrorAction SilentlyContinue | Where-Object `
                         -FilterScript { `
                             $_.AdditionalProperties.'@odata.type' -eq '#microsoft.graph.windows81SCEPCertificateProfile' `
@@ -523,7 +523,7 @@ function Set-TargetResource
             Write-Verbose -Message "Could not find trusted root certificate with Id {$RootCertificateId}, searching by display name {$RootCertificateDisplayName}"
 
             $RootCertificate = Get-MgBetaDeviceManagementDeviceConfiguration `
-                -Filter "DisplayName eq '$RootCertificateDisplayName'" `
+                -Filter "DisplayName eq '$($RootCertificateDisplayName -replace "'", "''")'" `
                 -ErrorAction SilentlyContinue | `
                     Where-Object -FilterScript {
                     $_.AdditionalProperties.'@odata.type' -eq '#microsoft.graph.windows81TrustedRootCertificate'
@@ -601,7 +601,7 @@ function Set-TargetResource
             Write-Verbose -Message "Could not find trusted root certificate with Id {$RootCertificateId}, searching by display name {$RootCertificateDisplayName}"
 
             $RootCertificate = Get-MgBetaDeviceManagementDeviceConfiguration `
-                -Filter "DisplayName eq '$RootCertificateDisplayName'" `
+                -Filter "DisplayName eq '$($RootCertificateDisplayName -replace "'", "''")'" `
                 -ErrorAction SilentlyContinue | `
                     Where-Object -FilterScript {
                     $_.AdditionalProperties.'@odata.type' -eq '#microsoft.graph.windows81TrustedRootCertificate'

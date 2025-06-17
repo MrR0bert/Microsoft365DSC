@@ -182,7 +182,7 @@ function Get-TargetResource
             if ($null -eq $AADApp)
             {
                 Write-Verbose -Message "Attempting to retrieve Azure AD Application by DisplayName {$DisplayName}"
-                $AADApp = [Array](Get-MgBetaApplication -Filter "DisplayName eq '$($DisplayName)'")
+                $AADApp = [Array](Get-MgBetaApplication -Filter "DisplayName eq '$($DisplayName -replace "'", "''")'")
             }
             if ($null -ne $AADApp -and $AADApp.Count -gt 1)
             {
@@ -895,7 +895,7 @@ function Set-TargetResource
         if ($null -eq $deletedApp)
         {
             Write-Verbose "Trying to retrieve existing deleted Applications from soft delete by DisplayName {$DisplayName}."
-            [Array]$deletedApp = Get-MgBetaDirectoryDeletedItemAsApplication -Filter "DisplayName eq '$DisplayName'" -ErrorAction SilentlyContinue
+            [Array]$deletedApp = Get-MgBetaDirectoryDeletedItemAsApplication -Filter "DisplayName eq '$($DisplayName -replace "'", "''")'" -ErrorAction SilentlyContinue
         }
 
         if ($null -ne $deletedApp -and $deletedApp.Length -eq 1)
@@ -1146,7 +1146,7 @@ function Set-TargetResource
             {
                 Write-Verbose -Message "Adding permissions for API {$($sourceAPI)}"
                 $permissionsForcurrentAPI = $Permissions | Where-Object -FilterScript { $_.SourceAPI -eq $sourceAPI }
-                $apiPrincipal = Get-MgServicePrincipal -Filter "DisplayName eq '$($sourceAPI)'"
+                $apiPrincipal = Get-MgServicePrincipal -Filter "DisplayName eq '$($sourceAPI -replace "'", "''")'"
                 $currentAPIAccess = @{
                     ResourceAppId  = $apiPrincipal.AppId
                     ResourceAccess = @()

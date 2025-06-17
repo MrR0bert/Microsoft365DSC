@@ -1367,8 +1367,8 @@ function Update-M365DSCAzureAdApplication
     $exSvcprincipal = Get-MgServicePrincipal -Filter "AppId eq '$resourceAppIdExchange'"
 
     Write-LogEntry ' '
-    Write-LogEntry 'Checking existance of AD Application'
-    if (-not ($azureADApp = Get-MgApplication -Filter "DisplayName eq '$($ApplicationName)'" -ErrorAction SilentlyContinue))
+    Write-LogEntry 'Checking existence of AD Application'
+    if (-not ($azureADApp = Get-MgApplication -Filter "DisplayName eq '$($ApplicationName -replace "'", "''")'" -ErrorAction SilentlyContinue))
     {
         $azureADApp = New-MgApplication -DisplayName $ApplicationName
         Write-LogEntry "  New Azure AD application '$ApplicationName' created!"

@@ -220,7 +220,7 @@ function Get-TargetResource
                 {
                     $getValue = Get-MgBetaDeviceManagementDeviceConfiguration `
                         -All `
-                        -Filter "DisplayName eq '$DisplayName'" `
+                        -Filter "DisplayName eq '$($DisplayName -replace "'", "''")'" `
                         -ErrorAction SilentlyContinue | Where-Object `
                         -FilterScript { `
                             $_.AdditionalProperties.'@odata.type' -eq '#microsoft.graph.windowsWiredNetworkConfiguration' `
@@ -1319,7 +1319,7 @@ function Get-IntuneDeviceConfigurationCertificateId
         Write-Verbose -Message "Could not find certificate with Id {$CertificateId}, searching by display name {$CertificateDisplayName}"
 
         $Certificate = Get-MgBetaDeviceManagementDeviceConfiguration `
-            -Filter "DisplayName eq '$CertificateDisplayName'" `
+            -Filter "DisplayName eq '$($CertificateDisplayName -replace "'", "''")'" `
             -ErrorAction SilentlyContinue | `
                 Where-Object -FilterScript {
                 $_.AdditionalProperties.'@odata.type' -in $OdataTypes

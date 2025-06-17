@@ -133,7 +133,7 @@ function Get-TargetResource
                 {
                     $getValue = Get-MgBetaDeviceManagementWindowsAutopilotDeploymentProfile `
                         -All `
-                        -Filter "DisplayName eq '$DisplayName'" `
+                        -Filter "DisplayName eq '$($DisplayName -replace "'", "''")'" `
                         -ErrorAction SilentlyContinue `
                     | Where-Object -FilterScript { $null -ne $_.DisplayName }
                 }
