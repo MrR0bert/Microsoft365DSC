@@ -1,0 +1,16 @@
+{
+  "resourceName": "IntuneBrandingProfiles",
+  "description": "The Intune Branding PRofiles for the Company Portal",
+  "permissions": {
+    "graph": {
+      "delegated": {
+        "read": [],
+        "update": []
+      },
+      "application": {
+        "read": [],
+        "update": []
+      }
+    }
+  }
+}
