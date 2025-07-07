@@ -18,6 +18,13 @@ class MSFT_MicrosoftGraphRgbColor
     [Write, Description("The amount of blue")] UInt32 B;
 };
 
+[ClassVersion("1.0.0.0")]
+class MSFT_MicrosoftGraphMimeContent
+{
+    [Write, Description("The MIME type of the content, such as 'image/png' or 'application/pdf'.")] String Type;
+    [Write, Description("The base64-encoded representation of the binary content (e.g., image or document data).")] String Value;
+};
+
 [ClassVersion("1.0.0.0"), FriendlyName("IntuneBrandingProfiles")]
 class MSFT_IntuneBrandingProfiles : OMI_BaseResource
 {
@@ -41,7 +48,7 @@ class MSFT_IntuneBrandingProfiles : OMI_BaseResource
     [Write, Description("Indicates whether this is the default branding profile.")] Boolean IsDefaultProfile;
     [Write, Description("Indicates whether the factory reset option is disabled for corporate-owned devices.")] Boolean IsFactoryResetDisabled;
     [Write, Description("Indicates whether the remove device option is disabled for corporate-owned devices.")] Boolean IsRemoveDeviceDisabled;
-    [Write, Description("Image displayed on the customized landing page in the Company Portal.")] String LandingPageCustomizedImage;
+    [Write, Description("Image displayed on the customized landing page in the Company Portal."), EmbeddedInstance("MSFT_MicrosoftGraphMimeContent")] String LandingPageCustomizedImage;
     [Write, Description("Logo used when the Company Portal is in light theme.")] String LightBackgroundLogo;
     [Write, Description("Name of the online support site shown in the Company Portal.")] String OnlineSupportSiteName;
     [Write, Description("URL of the online support site shown in the Company Portal.")] String OnlineSupportSiteUrl;

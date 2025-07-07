@@ -48,20 +48,12 @@ function Get-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $DisableClientTelemetry,
-
-        [Parameter()]
-        [System.Boolean]
         $DisableDeviceCategorySelection,
 
         [Parameter()]
         [System.String]
         [ValidateSet('availableWithPrompts', 'availableWithoutPrompts', 'unavailable')]
         $EnrollmentAvailability,
-
-        [Parameter()]
-        [System.Boolean]
-        $IsDefaultProfile,
 
         [Parameter()]
         [System.Boolean]
@@ -98,7 +90,7 @@ function Get-TargetResource
         [Parameter()]
         [System.String]
         $ProfileName,
-        
+
         [Parameter()]
         [System.String[]]
         $RoleScopeTagIds,
@@ -230,7 +222,7 @@ function Get-TargetResource
         }
 
         Write-Verbose "The results are in for {$($instance.Id)} / {$($instance.DisplayName)}"
-        
+
         $themeColor = New-CimInstance -ClassName MSFT_MicrosoftGraphRgbColor -Namespace "root/microsoft/Windows/DesiredStateConfiguration" -ClientOnly -Property @{
             R = [uint32]($instance.ThemeColor.R -as [int] -as [uint32])
             G = [uint32]($instance.ThemeColor.G -as [int] -as [uint32])
@@ -249,13 +241,12 @@ function Get-TargetResource
             ContactItPhoneNumber                        = $instance.ContactItPhoneNumber
             CustomCanSeePrivacyMessage                  = $instance.CustomCanSeePrivacyMessage
             CustomCantSeePrivacyMessage                 = $instance.CustomCantSeePrivacyMessage
-            CustomPrivacyMessage                        = $instance.CustomPrivacyMessage
-            DisableClientTelemetry                      = $instance.DisableClientTelemetry
+            #CustomPrivacyMessage                        = $instance.CustomPrivacyMessage
+            #DisableClientTelemetry                      = $instance.DisableClientTelemetry > NOT YET SUPPORTED BY GRAPH
             DisableDeviceCategorySelection              = $instance.DisableDeviceCategorySelection
             EnrollmentAvailability                      = $instance.EnrollmentAvailability.toString()
-            IsDefaultProfile                            = $instance.IsDefaultProfile
-            IsFactoryResetDisabled                      = $instance.IsFactoryResetDisabled
-            IsRemoveDeviceDisabled                      = $instance.IsRemoveDeviceDisabled
+            #IsFactoryResetDisabled                      = $instance.IsFactoryResetDisabled
+            #IsRemoveDeviceDisabled                      = $instance.IsRemoveDeviceDisabled
             #LandingPageCustomizedImage                  = $instance.LandingPageCustomizedImage
             #LightBackgroundLogo                         = $instance.LightBackgroundLogo
             OnlineSupportSiteName                       = $instance.OnlineSupportSiteName
@@ -264,7 +255,7 @@ function Get-TargetResource
             ProfileDescription                          = $instance.ProfileDescription
             ProfileName                                 = $instance.ProfileName
             RoleScopeTagIds                             = $instance.RoleScopeTagIds
-            SendDeviceOwnershipChangePushNotification   = $instance.SendDeviceOwnershipChangePushNotification
+            #SendDeviceOwnershipChangePushNotification   = $instance.SendDeviceOwnershipChangePushNotification
             ShowAzureAdEnterpriseApps                   = $instance.ShowAzureAdEnterpriseApps
             ShowConfigurationManagerApps                = $instance.ShowConfigurationManagerApps
             ShowDisplayNameNextToLogo                   = $instance.ShowDisplayNameNextToLogo
@@ -345,20 +336,12 @@ function Set-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $DisableClientTelemetry,
-
-        [Parameter()]
-        [System.Boolean]
         $DisableDeviceCategorySelection,
 
         [Parameter()]
         [System.String]
         [ValidateSet('availableWithPrompts', 'availableWithoutPrompts', 'unavailable')]
         $EnrollmentAvailability,
-
-        [Parameter()]
-        [System.Boolean]
-        $IsDefaultProfile,
 
         [Parameter()]
         [System.Boolean]
@@ -395,7 +378,7 @@ function Set-TargetResource
         [Parameter()]
         [System.String]
         $ProfileName,
-        
+
         [Parameter()]
         [System.String[]]
         $RoleScopeTagIds,
@@ -484,32 +467,54 @@ function Set-TargetResource
 
     $setParameters = Remove-M365DSCAuthenticationParameter -BoundParameters $PSBoundParameters
     $setParameters.Remove('Id') | Out-Null
-    
+
+    $keys = (([Hashtable]$PSBoundParameters).Clone()).Keys
+    foreach ($key in $keys)
+    {
+        $keyName = $key.Substring(0, 1).ToLower() + $key.Substring(1, $key.Length - 1)
+        $keyValue = $PSBoundParameters.$key
+        if ($null -ne $PSBoundParameters.$key -and $PSBoundParameters.$key.GetType().Name -like '*cimInstance*')
+        {
+            $keyValue = Convert-M365DSCDRGComplexTypeToHashtable -ComplexObject $PSBoundParameters.$key
+        }
+        $PSBoundParameters.Remove($key)
+        $PSBoundParameters.Add($keyName, $keyValue)
+    }
+
+    $graphColor = [Microsoft.Graph.Beta.PowerShell.Models.MicrosoftGraphRgbColor]::new()
+    $graphColor.R = [int]$ThemeColor.R
+    $graphColor.G = [int]$ThemeColor.G
+    $graphColor.B = [int]$ThemeColor.B
+
+    $setParameters.ThemeColor = $graphColor
+
+    Write-Verbose -Message "ThemeColor values are of type $($graphColor.GetType())"
+
     # CREATE
     if ($Ensure -eq 'Present' -and $currentInstance.Ensure -eq 'Absent')
     {
         Write-Verbose -Message "Creating an Intune Branding Profile with DisplayName {$DisplayName}"
         New-MgBetaDeviceManagementIntuneBrandingProfile @SetParameters
     }
-    # UPDATE 
+    # UPDATE
     elseif ($Ensure -eq 'Present' -and $currentInstance.Ensure -eq 'Present')
     {
         Write-Verbose -Message "Updating Intune Branding Profile with DisplayName {$DisplayName} / {$($currentInstance.Id)}"
 
-        $keys = (([Hashtable]$PSBoundParameters).Clone()).Keys
-        foreach ($key in $keys)
-        {
-            $keyName = $key.Substring(0, 1).ToLower() + $key.Substring(1, $key.Length - 1)
-            $keyValue = $PSBoundParameters.$key
-            if ($null -ne $PSBoundParameters.$key -and $PSBoundParameters.$key.GetType().Name -like '*cimInstance*')
-            {
-                $keyValue = Convert-M365DSCDRGComplexTypeToHashtable -ComplexObject $PSBoundParameters.$key
-            }
-            $PSBoundParameters.Remove($key)
-            $PSBoundParameters.Add($keyName, $keyValue)
+        # For unkown reasons Graph does NOT allow for PATCH requests to update an IntuneBrandingProfile resource, so we need to delete and re-create it
+        #Update-MgBetaDeviceManagementIntuneBrandingProfile @SetParameters -ThemeColor $graphColor -IntuneBrandingProfileId $currentInstance.Id
+
+        Write-Verbose -Message "Graph does NOT allow for PATCH requests to update an IntuneBrandingProfile resource, so we need to delete and re-create it"
+        try {
+            Remove-MgBetaDeviceManagementIntuneBrandingProfile -IntuneBrandingProfileId $currentInstance.Id -Confirm:$false -Verbose -ErrorAction Stop
+            Write-Verbose -Message "Removal succes, creating new profile"
+            New-MgBetaDeviceManagementIntuneBrandingProfile @SetParameters -Verbose
+            Write-Verbose -Message "Done updating profile {$($DisplayName)}"
+        }
+        catch {
+            Write-Error $_.Exception.Message
         }
 
-        Update-MgBetaDeviceManagementIntuneBrandingProfile @SetParameters -ThemeColor $graphColor -IntuneBrandingProfileId $currentInstance.Id
     }
     # REMOVE
     elseif ($Ensure -eq 'Absent' -and $currentInstance.Ensure -eq 'Present')
@@ -570,20 +575,12 @@ function Test-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $DisableClientTelemetry,
-
-        [Parameter()]
-        [System.Boolean]
         $DisableDeviceCategorySelection,
 
         [Parameter()]
         [System.String]
         [ValidateSet('availableWithPrompts', 'availableWithoutPrompts', 'unavailable')]
         $EnrollmentAvailability,
-
-        [Parameter()]
-        [System.Boolean]
-        $IsDefaultProfile,
 
         [Parameter()]
         [System.Boolean]
@@ -620,7 +617,7 @@ function Test-TargetResource
         [Parameter()]
         [System.String]
         $ProfileName,
-        
+
         [Parameter()]
         [System.String[]]
         $RoleScopeTagIds,
